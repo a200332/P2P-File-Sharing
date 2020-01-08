@@ -97,4 +97,9 @@ public class ReceiveActivity extends AppCompatActivity {
         analytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
+    public void wifiDirectIntent(View view) {
+        Intent intent = new Intent(ReceiveActivity.this, WifiDirectConnectionActivity.class);
+        startActivityForResult(intent, 1234); // TODO make constant and implement on activity result
+
+    }
 }

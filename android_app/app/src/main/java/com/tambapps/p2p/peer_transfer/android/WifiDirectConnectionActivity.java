@@ -24,6 +24,8 @@ public class WifiDirectConnectionActivity extends WifiDirectActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_wifi_direct);
+
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setHasFixedSize(true);
 
@@ -34,11 +36,6 @@ public class WifiDirectConnectionActivity extends WifiDirectActivity {
         // specify an adapter (see also next example)
         recyclerAdapter = new MyAdapter(getPeers());
         recyclerView.setAdapter(recyclerAdapter);
-    }
-
-    @Override
-    int contentLayoutId() {
-        return R.layout.activity_wifi_direct;
     }
 
     @Override

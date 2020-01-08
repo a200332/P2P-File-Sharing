@@ -6,19 +6,25 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.OpenableColumns;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -30,18 +36,26 @@ import com.tambapps.p2p.peer_transfer.android.service.FileSendingJobService;
 import java.io.File;
 import java.net.SocketException;
 
-public class SendActivity extends AppCompatActivity {
+public class SendActivity extends WifiDirectActivity {
 
     private final static int PICK_FILE = 1;
     private FirebaseAnalytics analytics;
 
+    private ToggleButton wifiDirectButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_send);
+
+        wifiDirectButton = findViewById(R.id.wifi_direct_button);
+        if (isWifiEnabled()) {
+            wifiDirectButton.setChecked(true);
+            discoverPeers();
+        }
+
         analytics = FirebaseAnalytics.getInstance(this);
 
-        setContentView(R.layout.activity_send);
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -148,21 +162,24 @@ public class SendActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PICK_FILE) {
             if (resultCode == RESULT_OK) {
-
-                final Peer peer = getPeer();
-                if (peer == null) {
-                    Toast.makeText(this, this.getString(R.string.network_error), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (sendFile(data.getData(), peer)) {
-                    sendContent(peer);
-                }
+                startSending(data.getData());
             } else {
                 Toast.makeText(this, this.getString(R.string.couldnt_get_file_short), Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void startSending(Uri uri) {
+        final Peer peer = getPeer();
+        if (peer == null) {
+            Toast.makeText(this, this.getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (sendFile(uri, peer)) {
+            sendContent(peer);
         }
     }
 
@@ -211,4 +228,15 @@ public class SendActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onDiscoverPeersSuccess() {
+        Toast.makeText(this, "WIFI DIRECT SUCCESS", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onThisDeviceChanged(WifiP2pDevice device) {
+        Toast.makeText(this, "TODO on this device", Toast.LENGTH_SHORT).show();
+    }
+
 }

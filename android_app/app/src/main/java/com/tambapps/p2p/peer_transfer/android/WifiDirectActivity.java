@@ -2,6 +2,7 @@ package com.tambapps.p2p.peer_transfer.android;
 
 import android.content.Context;
 import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
@@ -26,13 +27,8 @@ public abstract class WifiDirectActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(contentLayoutId());
         initializeP2PManager();
     }
-
-
-    @LayoutRes
-    abstract int contentLayoutId();
 
     private void initializeP2PManager() {
         // Indicates a change in the Wi-Fi P2P status.
@@ -114,4 +110,8 @@ public abstract class WifiDirectActivity extends AppCompatActivity {
 
     public void onPeersChanged(List<WifiP2pDevice> devices) {}
 
+    public boolean isWifiEnabled() {
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        return wifiManager.isWifiEnabled();
+    }
 }

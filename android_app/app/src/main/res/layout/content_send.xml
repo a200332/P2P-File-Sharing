@@ -18,5 +18,14 @@
         android:textAlignment="center"
         android:layout_gravity="center_horizontal"
         android:layout_height="wrap_content" />
-
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifi_direct_button"
+        android:textOn="With Wifi Direct"
+        android:textOff="Without Wifi Direct"
+        android:layout_below="@id/text_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        />
 </RelativeLayout>

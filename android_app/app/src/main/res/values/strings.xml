@@ -53,4 +53,7 @@
     <string name="connect_to">Connect to %s</string>
     <string name="connect_to_question">Do you want to connect to %s?</string>
     <string name="yes">yes</string>
+    <string name="cancel">cancel</string>
+    <string name="or">or</string>
+    <string name="use_wifi_direct">Use wifi direct</string>
 </resources>

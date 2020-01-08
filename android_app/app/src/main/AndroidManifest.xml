@@ -25,7 +25,7 @@
         android:roundIcon="@drawable/round_appicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".WifiDirectConnectionActivity"></activity>
+        <activity android:name=".WifiDirectConnectionActivity" />
         <activity
             android:name=".HelpActivity"
             android:theme="@style/AppTheme.NoActionBar" />
