@@ -94,6 +94,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
     public void receiveIntent(View view) {
+        if (true) {
+            startActivity(new Intent(this, WifiDirectConnectionActivity.class));
+            return;
+        }
         if (!hasWritePermission()) {
             writePermissionDialog();
             return;

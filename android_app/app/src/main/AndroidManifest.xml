@@ -2,8 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tambapps.p2p.peer_transfer.android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.CHANGE_WIFI_STATE"/>
+
+    <uses-feature android:name="android.hardware.wifi.direct" android:required="true"/>
 
     <application
         android:allowBackup="true"
@@ -12,9 +25,10 @@
         android:roundIcon="@drawable/round_appicon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".WifiDirectConnectionActivity"></activity>
         <activity
             android:name=".HelpActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
             android:name=".io.GenericFileProvider"
