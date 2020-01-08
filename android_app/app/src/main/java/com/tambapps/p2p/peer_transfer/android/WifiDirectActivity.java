@@ -5,9 +5,6 @@ import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
@@ -97,13 +94,7 @@ public abstract class WifiDirectActivity extends AppCompatActivity {
     }
 
     // method to override
-    public void onThisDeviceChanged(WifiP2pDevice device) {
-        Log.d("WIFI", "THISDEVICe");
-        TextView nameText = findViewById(R.id.peer_name);
-        nameText.setText("Name: " + device.deviceName);
-        TextView addressText = findViewById(R.id.peer_address);
-        addressText.setText("Address: " + device.deviceAddress);
-    }
+    public void onThisDeviceChanged(WifiP2pDevice device) { }
 
     public void onDiscoverPeersSuccess() {}
 

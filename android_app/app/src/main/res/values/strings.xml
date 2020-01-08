@@ -48,4 +48,9 @@
     <string name="couldn_get_ip_address">Couldn\'t get ip address. Please verify your internet connection</string>
     <string name="your_device">Your device</string>
     <string name="list_of_devices">List of devices</string>
+    <string name="peer_name">Name: %s</string>
+    <string name="peer_address">Address: %s</string>
+    <string name="connect_to">Connect to %s</string>
+    <string name="connect_to_question">Do you want to connect to %s?</string>
+    <string name="yes">yes</string>
 </resources>
