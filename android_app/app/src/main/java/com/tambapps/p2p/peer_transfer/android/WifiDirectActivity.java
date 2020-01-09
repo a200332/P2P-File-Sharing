@@ -1,13 +1,16 @@
 package com.tambapps.p2p.peer_transfer.android;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.widget.Toast;
 
-import androidx.annotation.LayoutRes;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.tambapps.p2p.peer_transfer.android.wifidirect.WDBroadcastReceiver;
@@ -16,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class WifiDirectActivity extends AppCompatActivity {
+
+    private static final int PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 234567890;
 
     private final List<WifiP2pDevice> devices = new ArrayList<>();
     private final IntentFilter intentFilter = new IntentFilter();
@@ -28,6 +33,29 @@ public abstract class WifiDirectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initializeP2PManager();
+        checkWifiDirectPermissions();
+    }
+
+    private void checkWifiDirectPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    WifiDirectActivity.PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION);
+            // After this point you wait for callback in
+            // onRequestPermissionsResult(int, String[], int[]) overridden method
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(), this.getString(R.string.wifi_direct_permissions_not_granted), Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
     private void initializeP2PManager() {

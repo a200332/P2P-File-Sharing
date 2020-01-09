@@ -56,4 +56,5 @@
     <string name="cancel">cancel</string>
     <string name="or">or</string>
     <string name="use_wifi_direct">Use wifi direct</string>
+    <string name="wifi_direct_permissions_not_granted">Permissions not granted, couldn\'t start Wifi Direct</string>
 </resources>
