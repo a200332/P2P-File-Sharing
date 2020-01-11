@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +20,7 @@ import com.tambapps.p2p.peer_transfer.android.wifidirect.WDBroadcastReceiver;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class WifiDirectActivity extends AppCompatActivity {
+public abstract class WifiDirectActivity extends AppCompatActivity implements WifiP2pManager.ConnectionInfoListener {
 
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_FINE_LOCATION = 234567890;
 
@@ -28,6 +30,7 @@ public abstract class WifiDirectActivity extends AppCompatActivity {
     private WifiP2pManager manager;
     private WDBroadcastReceiver receiver;
     private boolean wifiP2pEnabled = false;
+    private boolean isConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,17 +115,62 @@ public abstract class WifiDirectActivity extends AppCompatActivity {
         });
     }
 
+    public void connect(final String deviceAddress) { // from wifiP2PDevice
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = deviceAddress;
+        manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                onConnectSuccess(deviceAddress);
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                onConnectFailure(reason);
+            }
+        });
+    }
+
+    public void disconnect() {
+        manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                onDisconnectSuccess();
+            }
+
+            @Override
+            public void onFailure(int reasonCode) {
+                onDisconnectFailure(reasonCode);
+
+            }
+
+
+        });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isConnected) {
+            disconnect();
+        }
+    }
 
     public boolean isWifiP2pEnabled() {
         return wifiP2pEnabled;
     }
 
-    // method to override
+    // methods to override
     public void onThisDeviceChanged(WifiP2pDevice device) { }
-
     public void onDiscoverPeersSuccess() {}
-
     public void onDiscoverPeersFailure(int reasonCode) {}
+    public void onConnectFailure(int reason) {}
+    public void onConnectSuccess(String deviceAddress) {}
+    @Override public void onConnectionInfoAvailable(WifiP2pInfo info) { }
+    public void onDisconnectSuccess() {}
+    public void onDisconnectFailure(int reason) {}
+
 
     public List<WifiP2pDevice> getPeers() {
         return this.devices;

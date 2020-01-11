@@ -6,19 +6,16 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.provider.OpenableColumns;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
 import android.view.View;
@@ -33,8 +30,18 @@ import com.tambapps.p2p.fandem.util.IPUtils;
 import com.tambapps.p2p.peer_transfer.android.analytics.AnalyticsValues;
 import com.tambapps.p2p.peer_transfer.android.service.FileSendingJobService;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SendActivity extends WifiDirectActivity {
 
@@ -42,6 +49,7 @@ public class SendActivity extends WifiDirectActivity {
     private FirebaseAnalytics analytics;
 
     private ToggleButton wifiDirectButton;
+    private ExecutorService executorService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,6 +245,38 @@ public class SendActivity extends WifiDirectActivity {
     @Override
     public void onThisDeviceChanged(WifiP2pDevice device) {
         Toast.makeText(this, "TODO on this device", Toast.LENGTH_SHORT).show();
+        //startWifiDirectConnectionSocket(device.deviceAddress);
     }
 
+    private void startWifiDirectConnectionSocket(final String address) {
+        if (executorService == null) {
+            executorService = Executors.newSingleThreadExecutor();
+        }
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                socketConnector(address);
+            }
+        });
+    }
+
+    private void socketConnector(String address) {
+        try (ServerSocket serverSocket = new ServerSocket(WifiDirectConnectionActivity.WIFI_DIRECT_CONNECTION_PORT, 2)) {
+            Socket socket = serverSocket.accept();
+            Log.d("SEND", "Connected to " + socket.getInetAddress());
+            try (DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream())) {
+                // TODO transfer port
+                dataOutputStream.writeInt(50);
+            }
+        } catch (IOException e) {
+            Log.e("Error", "error when creating server socket", e);
+            Log.e("Error", e.getMessage());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(SendActivity.this, "Error: Couldn't create a Wi-Fi Direct connection", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
 }

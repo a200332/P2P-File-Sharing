@@ -3,7 +3,9 @@ package com.tambapps.p2p.peer_transfer.android;
 
 import android.content.DialogInterface;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +17,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class WifiDirectConnectionActivity extends WifiDirectActivity {
 
+    public static final int WIFI_DIRECT_CONNECTION_PORT = 7999;
+
     private RecyclerView.Adapter recyclerAdapter;
+    private ExecutorService executorService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +100,6 @@ public class WifiDirectConnectionActivity extends WifiDirectActivity {
         @Override
         public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             final WifiP2pDevice device = peers.get(position);
-            // TODO set views
             holder.position = position;
             holder.nameText.setText(getString(R.string.peer_name, device.deviceName));
             holder.addressText.setText(getString(R.string.peer_address, device.deviceAddress));
@@ -102,8 +112,7 @@ public class WifiDirectConnectionActivity extends WifiDirectActivity {
                             .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(WifiDirectConnectionActivity.this, "TODO", Toast.LENGTH_SHORT).show();
-                                    // TODO connect on socket
+                                    connect(device.deviceAddress);
                                 }
                             })
                             .setNeutralButton(R.string.no, null)
@@ -131,5 +140,44 @@ public class WifiDirectConnectionActivity extends WifiDirectActivity {
         }
     }
 
+    private void startWifiDirectConnectionSocket(final String address) {
+        if (executorService == null) {
+            executorService = Executors.newSingleThreadExecutor();
+        }
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                socketConnector(address);
+            }
+        });
+    }
 
+    private void socketConnector(String address) {
+        Log.d("WIFI", "start start communicating");
+
+        try (Socket socket = new Socket(address, WIFI_DIRECT_CONNECTION_PORT)) {
+            try (DataInputStream is = new DataInputStream(socket.getInputStream())) {
+                int port = is.readInt();
+                Log.d("WIFI", port + "");
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onConnectSuccess(String deviceAddress) {
+        Toast.makeText(this, "Connection successful to " + deviceAddress, Toast.LENGTH_SHORT).show();
+        Log.d("Wifi", "onConnectSuccess");
+    }
+
+    @Override
+    public void onConnectionInfoAvailable(WifiP2pInfo info) {
+        Toast.makeText(this, "INFO available ", Toast.LENGTH_SHORT).show();
+        Log.d("Wifi", "onConnectionInfoAvailable");
+
+    }
 }
